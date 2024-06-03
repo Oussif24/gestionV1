@@ -122,5 +122,13 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+    'aliases' => [
+        'App' => Illuminate\Support\Facades\App::class,
+        'Auth' => Illuminate\Support\Facades\Auth::class,
+        // Ajoutez ou assurez-vous que cette ligne existe
+        'Log' => Illuminate\Support\Facades\Log::class,
+        
+    ],
+    
 
 ];

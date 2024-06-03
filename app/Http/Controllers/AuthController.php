@@ -8,13 +8,24 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
+
 
 class AuthController extends Controller
 {
-    public function showLoginForm($role)
-    {
-        return view('auth.login', ['role' => $role]);
+    // public function showLoginForm($role)
+    // {
+    //     return view('auth.login', ['role' => $role]);
+    // }
+    public function showLoginForm($role = null)
+{
+    if ($role === null) {
+        // Gérer le cas où aucun rôle n'est fourni
+        // Par exemple, rediriger vers un rôle par défaut ou retourner une erreur
+        return redirect()->route('login', ['role' => 'defaultRole']);  // Choisissez un rôle par défaut ou gérez autrement
     }
+    return view('auth.login', ['role' => $role]);
+}
 
     public function showRegisterForm($role)
     {
@@ -23,9 +34,9 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('email', 'password','role');
         $credentials['role'] = $request->role;
-
+        
         if (Auth::attempt($credentials)) {
             return $this->redirectBasedOnRole(Auth::user());
         }
@@ -37,24 +48,32 @@ class AuthController extends Controller
 
     public function register(Request $request, $role)
     {
+        // Validation des données, y compris l'unicité de l'email
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|confirmed|min:8',
+            // 'role' => 'required|in:admin,respo,client',
         ]);
 
+        // Création de l'utilisateur
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            // 'password' => $request->password,
             'role' => $role,
             'subscription' => $request->subscription ?? 'none',
         ]);
 
+        // Envoyer un e-mail de bienvenue
         Mail::to($user->email)->send(new WelcomeMail($user));
 
+        // Connexion automatique de l'utilisateur après l'enregistrement
         Auth::login($user);
-
+        // Flasher un message de succès
+        session()->flash('success', 'Inscription réussie ! Bienvenue ' . $user->name);
+      // Redirection en fonction du rôle
         return $this->redirectBasedOnRole($user);
     }
 
@@ -66,6 +85,7 @@ class AuthController extends Controller
 
     protected function redirectBasedOnRole($user)
     {
+        // Log::info('User role: ' . $user->role);
         switch ($user->role) {
             case 'admin':
                 return redirect()->route('admin.dashboard');
@@ -74,14 +94,8 @@ class AuthController extends Controller
             case 'client':
                 return redirect()->route('client.dashboard');
             default:
-                return redirect('/');
+                Log::warning('User with undefined role tried to login', ['user_id' => $user->id]);
+                return redirect('/');  // Rediriger vers une page de "rôle non reconnu" ou la page d'accueil
         }
-    }
-
-    public function checkEmail(Request $request)
-    {
-        $email = $request->input('email');
-        $exists = User::where('email', $email)->exists();
-        return response()->json(['exists' => $exists]);
     }
 }

@@ -7,5 +7,11 @@
 </head>
 <body>
     <h1>Bienvenue dans Admin Dashboard, {{ Auth::user()->name }}</h1>
+    <!-- Affichage du message de succès flashé -->
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 </body>
 </html>
