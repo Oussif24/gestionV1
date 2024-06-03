@@ -31,9 +31,9 @@ Route::get('check-email', [AuthController::class, 'checkEmail'])->name('check-em
 
 // Routes pour les tableaux de bord spécifiques aux rôles, sécurisées par le middleware 'auth'
 Route::middleware(['auth'])->group(function () {
-    Route::get('admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('admin/users/manage-users', function () {
+        return view('admin.users.manage-users');
+    })->name('admin.users.manage-users');
 
     Route::get('respo/dashboard', function () {
         return view('respo.dashboard');

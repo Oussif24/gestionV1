@@ -88,7 +88,7 @@ class AuthController extends Controller
         // Log::info('User role: ' . $user->role);
         switch ($user->role) {
             case 'admin':
-                return redirect()->route('admin.dashboard');
+                return redirect()->route('admin.users.manage-users');
             case 'respo':
                 return redirect()->route('respo.dashboard');
             case 'client':
