@@ -26,7 +26,6 @@
             <div class="dropdown">
                 <button class="dropbtn"><i class="fa fa-sign-in"></i> Se connecter</button>
                 <div class="dropdown-content">
-                    <a href="javascript:void(0)" onclick="redirectToLogin('admin')">Admin</a>
                     <a href="javascript:void(0)" onclick="redirectToLogin('respo')">Responsable</a>
                     <a href="javascript:void(0)" onclick="redirectToLogin('client')">Client</a>
                 </div>
